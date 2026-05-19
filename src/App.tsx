@@ -1,13 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import type { FilterStatus, Task } from "./types";
 import TaskList from "./components/TaskList";
 import TaskItem from "./components/TaskItem";
 import FullPageSpinner from "./components/FullPageSpinner";
-import { addTask, deleteTask, fetchTasks, updateTask } from "./api/taskApi";
 import SearchTask from "./components/SearchTask";
 import { useDebounce } from "./utility/useDebounce";
+import useFilteredTasks from "./hooks/useFilteredTasks";
+import {
+  addTask,
+  deleteTask,
+  fetchTasks,
+  updateTask,
+} from "./features/todoTask/taskSlice";
 
 function App() {
   const [newTask, setNewTask] = useState<Task>({
@@ -52,21 +58,7 @@ function App() {
   };
 
   // 🔹 Derived Data (Correct useMemo usage)
-  const filteredTasks = useMemo(() => {
-    let data = tasks;
-
-    // status filter
-    if (filter === "completed") {
-      data = data.filter((task) => task.completed);
-    } else if (filter === "pending") {
-      data = data.filter((task) => !task.completed);
-    }
-
-    // search filter
-    return data.filter((task) =>
-      task.title.toLowerCase().includes(debouncedSearch.toLowerCase()),
-    );
-  }, [tasks, filter, debouncedSearch]);
+  const filteredTasks = useFilteredTasks(tasks, filter, debouncedSearch);
 
   const handleFilterChange = (value: FilterStatus): void => {
     setFilter(value);

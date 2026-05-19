@@ -1,12 +1,65 @@
-import { createSlice } from "@reduxjs/toolkit";
-import type { TaskState } from "../../types";
-import { addTask, deleteTask, fetchTasks, updateTask } from "../../api/taskApi";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  addTaskApi,
+  deleteTaskApi,
+  fetchTasksApi,
+  updateTaskApi,
+} from "../../api/taskApi";
+import type { Task, TaskState } from "../../types";
 
 const initialState: TaskState = {
   data: [],
   error: null,
   pending: false,
 };
+
+export const fetchTasks = createAsyncThunk<Task[]>(
+  "tasks/fetchTasks",
+  async (_, thunkAPI) => {
+    try {
+      const response = await fetchTasksApi();
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const addTask = createAsyncThunk<Task, Task>(
+  "tasks/addTask",
+  async (data: Task, thunkAPI) => {
+    try {
+      const response = await addTaskApi(data);
+      return response.data; // send task back to slice
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const deleteTask = createAsyncThunk<number, number>(
+  "tasks/deleteTask",
+  async (id: number, thunkAPI) => {
+    try {
+      await deleteTaskApi(id);
+      return id; // send task back to slice
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const updateTask = createAsyncThunk<Task, Task>(
+  "tasks/updateTask",
+  async (data: Task, thunkAPI) => {
+    try {
+      const response = await updateTaskApi(data);
+      return response.data;
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
 
 const taskSlice = createSlice({
   name: "tasks",
@@ -24,7 +77,8 @@ const taskSlice = createSlice({
     });
 
     builder.addCase(fetchTasks.rejected, (state, action) => {
-      state.error = action.error.message || "Failed to fetch tasks";
+      // state.error = action.error.message || "Failed to fetch tasks";
+      state.error = (action.payload as string) || "Failed to fetch tasks";
       state.pending = false;
     });
 
@@ -39,7 +93,8 @@ const taskSlice = createSlice({
     });
 
     builder.addCase(addTask.rejected, (state, action) => {
-      state.error = action.error.message || "Failed to add task";
+      // state.error = action.error.message || "Failed to add task";
+      state.error = (action.payload as string) || "Failed to add tasks";
       state.pending = false;
     });
 
@@ -55,7 +110,8 @@ const taskSlice = createSlice({
     });
 
     builder.addCase(deleteTask.rejected, (state, action) => {
-      state.error = action.error.message || "Failed to delete task";
+      // state.error = action.error.message || "Failed to delete task";
+      state.error = (action.payload as string) || "Failed to delete task";
       state.pending = false;
     });
 
@@ -74,7 +130,8 @@ const taskSlice = createSlice({
     });
 
     builder.addCase(updateTask.rejected, (state, action) => {
-      state.error = action.error.message || "Failed to update task";
+      // state.error = action.error.message || "Failed to update task";
+      state.error = (action.payload as string) || "Failed to update tasks";
       state.pending = false;
     });
   },

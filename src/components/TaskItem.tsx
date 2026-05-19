@@ -5,8 +5,6 @@ interface TaskItemProps {
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   submitTask: () => void;
   handleFilterChange: (value: FilterStatus) => void;
-  // filterTask: () => void;
-  // resetTasks: () => void;
 }
 
 export default function TaskItem({
@@ -14,8 +12,6 @@ export default function TaskItem({
   handleChange,
   submitTask,
   handleFilterChange,
-  // filterTask,
-  // resetTasks,
 }: TaskItemProps) {
   return (
     <div className="flex items-center gap-2 mb-5!">
